@@ -57,6 +57,9 @@ class MigrateCommand extends Command
     /** @var int $expectedIssueId */
     private $expectedIssueId = 1;
 
+    /** @var int $bitBucketTotalIssues */
+    private $bitBucketTotalIssues;
+
     /**
      * @param BitBucketManager $bitBucketManager
      * @param GitHubManager    $gitHubManager
@@ -135,9 +138,9 @@ class MigrateCommand extends Command
             $this->bitBucketManager->configureAuth($bitBucketUser, $bitBucketPass);
         }
 
-        $bitBucketTotalIssues = $this->bitBucketManager->getTotalIssues();
+        $this->bitBucketTotalIssues = $this->bitBucketManager->getTotalIssues();
 
-        $this->ioWriter->writeln(sprintf('Repo <info>%s</info> on BitBucket contains <info>%s</info> issues', $bitBucketRepo, $bitBucketTotalIssues));
+        $this->ioWriter->writeln(sprintf('Repo <info>%s</info> on BitBucket contains <info>%s</info> issues', $bitBucketRepo, $this->bitBucketTotalIssues));
 
         $gitHubRepo = $input->getOption('gh-repo');
         if (null === $gitHubRepo) {
@@ -190,7 +193,7 @@ class MigrateCommand extends Command
         $this->ioWriter->writeln(sprintf('Retrieving issues from <info>BitBucket:%s</info>', $bitBucketRepo));
 
         $issuesSection = $output->section();
-        $progress      = new ProgressBar($output, $bitBucketTotalIssues);
+        $progress      = new ProgressBar($output, $this->bitBucketTotalIssues);
         $progress->advance();
 
         $issues = $this->bitBucketManager->getIssues();
@@ -210,11 +213,12 @@ class MigrateCommand extends Command
      */
     private function processIssues(array $issuesResponse, ProgressBar $progress, ConsoleSectionOutput $issuesSection, ConsoleOutput $output): void
     {
-        // dump($issuesResponse);
         foreach ($issuesResponse['values'] as $issue) {
             if (false === $this->isExpectedIssueId($issue)) {
                 while (false === $this->isExpectedIssueId($issue)) {
                     $this->fillTheGap($issue, $issuesSection, $output);
+                    ++$this->bitBucketTotalIssues;
+                    $progress->setMaxSteps($this->bitBucketTotalIssues);
                     $progress->advance();
                 }
             }
