@@ -21,7 +21,7 @@ To use this app, follow the following steps:
 
 3. The use the command `bb2gh:migrate` to start the migration, providing the relevant information
 
-       $ bin/console bb2gh:migrate --bb-repo Aerendir/bitbucket-source-repo --bb-user Aerendir --bb-pass Y0uRP4$s --gh-repo Aerendir/github-destination-repo --gh-user Aerendir --gh-pass Y0uRP4$s
+       $ bin/console bb2gh:migrate --bb-repo Aerendir/bitbucket-source-repo --bb-user Aerendir --bb-pass Y0uRP4$s --gh-repo Aerendir/github-destination-repo --gh-user Aerendir --gh-pass Y0uRP4$s -vvv
 
 This command will start the migration
 
@@ -44,6 +44,8 @@ The script will be able to resume an interrupted import.
 NOTE: You can safely pass the passwords to the command as it is meant to be used only locally.
 
 Keep attention because the passwords will be logged in the console.
+
+NOTE: Passing the flag `-vvv` will make you able to debug the script in case of errors.
 
 ATTENTION: Requirements
 -----------------------
